@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
@@ -73,12 +73,27 @@ services:
         hard: -1
     cap_add:
       - ALL
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+    - MONGO_DATA_DIR=/data/db
+    - MONGO_LOG_DIR=/dev/null
+    volumes:
+    - mongodb:/data/db
+    ports:
+    - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+  nginxu:
+    image: zixuzhao/nginxu
+    volumes:
+      - nginxuv:/etc/nginx/conf.d/
   nginx:
     image: nginx:latest
     ports:
         - 8080:80
     volumes:
-        - ${PWD}/nginx-config/:/etc/nginx/conf.d/
+        - nginxuv:/etc/nginx/conf.d/
     command: /bin/bash -c "nginx -g 'daemon off;'"
     ulimits:
       nproc: 65535
@@ -86,3 +101,5 @@ volumes:
   esdata1:
   esdata2:
   esdata3:
+  nginxuv:
+  mongodb:
